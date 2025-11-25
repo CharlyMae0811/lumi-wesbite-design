@@ -439,18 +439,24 @@
     transform:scale(1.05);
   }
 
-  /* Large sphere + pulse animation */
-  body.intro .sphere-wrapper {
+  /* Large sphere position during intro */
+body.intro .sphere-wrapper {
   margin-top: 40px;
-  }
+  transform: scale(1.4); /* ~40% bigger at the start */
+}
 
-  .sphere-wrapper.intro-pulse{
-    animation:introPulse 4.5s ease-in-out forwards;
-  }
-
- .sphere-wrapper.intro-pulse {
-  animation: introPulse 6s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+/* Smooth, slightly shorter pulse that shrinks to normal size */
+.sphere-wrapper.intro-pulse {
+  animation: introPulse 4s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
   transform-origin: center center;
+}
+@keyframes introPulse {
+  0%   { transform: scale(1.4); }
+  18%  { transform: scale(1.55); }
+  36%  { transform: scale(1.42); }
+  60%  { transform: scale(1.50); }
+  80%  { transform: scale(1.38); }
+  100% { transform: scale(1.0); }
 }
 
   /* When intro ends (body no longer has .intro), everything fades in */
@@ -990,7 +996,7 @@ window.addEventListener('load', () => {
 
     // remove intro class so header + panels slide/fade in
     document.body.classList.remove('intro');
-  }, 6000); // match introPulse duration
+  }, 4200); // match introPulse duration
 });
 </script>
 </body>
