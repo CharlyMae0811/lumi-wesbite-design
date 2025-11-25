@@ -491,54 +491,9 @@ body.intro .sphere-wrapper {
 
 <!-- MAIN APP -->
 <div class="app">
-  <!-- LEFT: transcript + feedback -->
+
+  <!-- LEFT: controls + selections -->
   <div class="col col-left">
-    <div class="panel">
-      <h3>Dialogue transcript</h3>
-      <p class="panel-subtitle">
-        Conversation with the current seller persona. Voice or text input will appear here.
-      </p>
-      <div id="dialogueTranscript" class="box box-chat" style="margin-top:8px;"></div>
-
-      <div class="row row-left" style="margin-top:10px;">
-        <input id="textInput" type="text" class="text-input"
-               placeholder="…or type here and click Send" />
-      </div>
-      <div class="row row-left" style="margin-top:6px;">
-        <button id="confirmBtn">Send</button>
-        <button id="clearBtn" class="btn-ghost">Clear</button>
-        <button id="feedbackBtn" class="btn-ghost">💬 Give me feedback</button>
-      </div>
-    </div>
-
-    <div id="feedbackPanel" class="panel" style="margin-top:12px; display:none;">
-      <h3>Session feedback</h3>
-      <p class="panel-subtitle">
-        Automated coaching summary from the scoring agent.
-      </p>
-      <div id="feedbackBox" class="box box-compact" style="margin-top:8px;"></div>
-    </div>
-  </div>
-
-  <!-- CENTER: orb + mic -->
-  <div class="col col-center">
-    <div class="stage">
-      <div class="sphere-wrapper">
-        <canvas id="fog" width="520" height="520"></canvas>
-        <!-- logo inside the sphere for intro -->
-        <img src="logo.png" alt="LUMI logo inside sphere" class="sphere-logo" />
-      </div>
-    </div>
-    <div class="center-controls">
-      <div class="row">
-        <button id="micBtn">🎤 Hold to talk</button>
-        <span id="status" class="controls-label">mic: off</span>
-      </div>
-    </div>
-  </div>
-
-  <!-- RIGHT: controls + selections -->
-  <div class="col col-right">
     <div class="panel panel-soft">
       <h3>Call controls</h3>
       <p class="panel-subtitle">Prototype controls for this seller scenario.</p>
@@ -583,6 +538,47 @@ body.intro .sphere-wrapper {
           <option>Black Friday deals</option>
         </select>
       </div>
+    </div>
+  </div>
+
+  <!-- CENTER: orb + mic -->
+  <div class="col col-center">
+    <div class="stage">
+      <div class="sphere-wrapper">
+        <canvas id="fog" width="520" height="520"></canvas>
+        <img src="logo.png" class="sphere-logo" />
+      </div>
+    </div>
+    <div class="center-controls">
+      <div class="row">
+        <button id="micBtn">🎤 Hold to talk</button>
+        <span id="status" class="controls-label">mic: off</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT: transcript + feedback -->
+  <div class="col col-right">
+    <div class="panel">
+      <h3>Dialogue transcript</h3>
+      <p class="panel-subtitle">Conversation with the current seller persona.</p>
+      <div id="dialogueTranscript" class="box box-chat"></div>
+
+      <div class="row row-left" style="margin-top:10px;">
+        <input id="textInput" type="text" class="text-input"
+               placeholder="…or type here and click Send" />
+      </div>
+      <div class="row row-left" style="margin-top:6px;">
+        <button id="confirmBtn">Send</button>
+        <button id="clearBtn" class="btn-ghost">Clear</button>
+        <button id="feedbackBtn" class="btn-ghost">💬 Give me feedback</button>
+      </div>
+    </div>
+
+    <div id="feedbackPanel" class="panel" style="margin-top:12px; display:none;">
+      <h3>Session feedback</h3>
+      <p class="panel-subtitle">Automated coaching summary from the scoring agent.</p>
+      <div id="feedbackBox" class="box box-compact"></div>
     </div>
   </div>
 </div>
