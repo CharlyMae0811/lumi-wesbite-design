@@ -184,7 +184,7 @@
       drop-shadow(0 0 70px rgba(180,140,255,.95));
     opacity:0;
     pointer-events:none;
-    transition:opacity .8s ease, transform .8s ease;
+    transition: opacity .3s ease;  /* <--- changed */
   }
 
   .center-controls{
@@ -439,25 +439,39 @@
     transform:scale(1.05);
   }
 
-  /* Large sphere position during intro */
+/* Large sphere position in intro */
 body.intro .sphere-wrapper {
   margin-top: 40px;
-  transform: scale(1.4); /* ~40% bigger at the start */
 }
 
-/* Smooth, slightly shorter pulse that shrinks to normal size */
+/* Smooth, big intro pulse */
 .sphere-wrapper.intro-pulse {
   animation: introPulse 4s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
   transform-origin: center center;
 }
+
+/* Smooth multi-pulse: starts ~40% bigger, gently settles */
 @keyframes introPulse {
-  0%   { transform: scale(1.4); }
-  18%  { transform: scale(1.55); }
-  36%  { transform: scale(1.42); }
-  60%  { transform: scale(1.50); }
-  80%  { transform: scale(1.38); }
-  100% { transform: scale(1.0); }
+  0% {
+    transform: scale(1.4);    /* ~40% bigger */
+  }
+  20% {
+    transform: scale(1.55);   /* first soft peak */
+  }
+  40% {
+    transform: scale(1.45);   /* relax a bit */
+  }
+  60% {
+    transform: scale(1.52);   /* second pulse */
+  }
+  80% {
+    transform: scale(1.42);   /* settle down */
+  }
+  100% {
+    transform: scale(1.0);    /* final normal size */
+  }
 }
+
 
   /* When intro ends (body no longer has .intro), everything fades in */
 </style>
@@ -988,11 +1002,10 @@ window.addEventListener('load', () => {
   setTimeout(() => {
     // logo inside sphere fades "up" (via CSS transform/opacity)
     sphereLogo.style.opacity = '0';
-    sphereLogo.style.transform = 'translateY(-40px) scale(0.7)';
 
     // remove intro class so header + panels slide/fade in
     document.body.classList.remove('intro');
-  }, 4200); // match introPulse duration
+  }, 4000); // match introPulse duration
 });
 </script>
 </body>
