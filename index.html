@@ -448,14 +448,9 @@
     animation:introPulse 4.5s ease-in-out forwards;
   }
 
-  @keyframes introPulse{
-  0%   { transform:scale(1.6); }
-  16%  { transform:scale(1.95); }
-  33%  { transform:scale(1.7); }
-  50%  { transform:scale(1.95); }
-  66%  { transform:scale(1.7); }
-  83%  { transform:scale(1.9); }
-  100% { transform:scale(1); }
+ .sphere-wrapper.intro-pulse {
+  animation: introPulse 6s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+  transform-origin: center center;
 }
 
   /* When intro ends (body no longer has .intro), everything fades in */
@@ -995,7 +990,7 @@ window.addEventListener('load', () => {
 
     // remove intro class so header + panels slide/fade in
     document.body.classList.remove('intro');
-  }, 4500); // match introPulse duration
+  }, 6000); // match introPulse duration
 });
 </script>
 </body>
