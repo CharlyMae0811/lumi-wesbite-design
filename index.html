@@ -18,27 +18,27 @@
   }
 
   html{
-  margin:0;
-  height:100%;
-}
+    margin:0;
+    height:100%;
+  }
 
   body{
-  margin:0;
-  min-height:100vh;
-  display:flex;
-  flex-direction:column;
-  background:radial-gradient(circle at top, #101b2b 0%, #0a111c 45%, #05070b 75%, #020308 100%);
-  color:var(--text-main);
-  font-family:system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
-  overflow-x:hidden;
-}
-
+    margin:0;
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    background:radial-gradient(circle at top, #101b2b 0%, #0a111c 45%, #05070b 75%, #020308 100%);
+    color:var(--text-main);
+    font-family:system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+    overflow-x:hidden;
+  }
 
   /* ----- HEADER ----- */
   .header-wrap {
     width:100%;
     padding:20px 24px 0;
     box-sizing:border-box;
+    transition:opacity .8s ease, transform .8s ease;
   }
 
   .header {
@@ -57,6 +57,7 @@
   .amazon-logo{
     width:auto;
     display:inline-block;
+    transition:opacity .8s ease, transform .8s ease, filter .3s ease;
   }
 
   .logo{
@@ -65,7 +66,6 @@
       brightness(2.6)
       drop-shadow(0 0 26px rgba(120,200,255,1))
       drop-shadow(0 0 55px rgba(160,120,255,.9));
-    transition:.3s ease;
   }
 
   .amazon-logo{
@@ -78,13 +78,12 @@
 
   .logo:hover,
   .amazon-logo:hover{
-  filter:
-    brightness(3)
-    drop-shadow(0 0 30px rgba(120,200,255,1))
-    drop-shadow(0 0 65px rgba(160,120,255,.95));
-  transform: translateY(-1px);
-}
-
+    filter:
+      brightness(3)
+      drop-shadow(0 0 30px rgba(120,200,255,1))
+      drop-shadow(0 0 65px rgba(160,120,255,.95));
+    transform: translateY(-1px);
+  }
 
   .icon-button{
     background:transparent;
@@ -97,6 +96,7 @@
     gap:8px;
     cursor:pointer;
     font-size:13px;
+    transition:opacity .8s ease, transform .8s ease;
   }
 
   .icon-button span{
@@ -129,20 +129,21 @@
   }
 
   /* ----- MAIN LAYOUT ----- */
- .app{
-   flex:1; 
-  display:grid;
-  grid-template-columns: minmax(300px, 340px) minmax(520px, 1fr) minmax(300px, 340px);
-  gap:24px;
-  align-items:flex-start;
-  padding:16px 24px 24px;
-  max-width:1400px;  /* increased from 1200px → gives room */
-  width:100%;
-  margin:0 auto;
-  box-sizing:border-box;
-}
+  .app{
+    flex:1;
+    display:grid;
+    grid-template-columns: minmax(300px, 340px) minmax(520px, 1fr) minmax(300px, 340px);
+    gap:24px;
+    align-items:flex-start;
+    padding:16px 24px 24px;
+    max-width:1400px;
+    width:100%;
+    margin:0 auto;
+    box-sizing:border-box;
+    transition:opacity .8s ease, transform .8s ease;
+  }
 
-  .col{ min-width:0; }
+  .col{ min-width:0; transition:opacity .8s ease, transform .8s ease; }
 
   @media(max-width:960px){
     .app{
@@ -156,11 +157,13 @@
     justify-content:center;
     align-items:flex-start;
     margin-top:12px;
+    transition:min-height .8s ease;
   }
 
   .sphere-wrapper{
     position:relative;
     display:inline-block;
+    transition:transform .9s ease;
   }
 
   #fog{
@@ -179,12 +182,14 @@
       invert(1)
       drop-shadow(0 0 35px rgba(180,220,255,1))
       drop-shadow(0 0 70px rgba(180,140,255,.95));
-    opacity:1;
+    opacity:0;
     pointer-events:none;
+    transition:opacity .8s ease, transform .8s ease;
   }
 
   .center-controls{
     margin-top:4px;
+    transition:opacity .8s ease, transform .8s ease;
   }
 
   /* ----- BUTTONS & PANELS ----- */
@@ -392,10 +397,77 @@
     flex-wrap:wrap;
     border-top:1px solid rgba(124,211,255,0.03);
     padding-top:8px;
+    transition:opacity .8s ease, transform .8s ease;
   }
+
+  /* ================== INTRO STATE ================== */
+
+  body.intro .header-wrap,
+  body.intro .footer{
+    opacity:0;
+    transform:translateY(-20px);
+    pointer-events:none;
+  }
+
+  body.intro .amazon-logo,
+  body.intro .header-center .logo,
+  body.intro .header-right .icon-button{
+    opacity:0;
+    transform:translateY(-10px);
+    pointer-events:none;
+  }
+
+  body.intro .app{
+    max-width:none;
+    grid-template-columns:1fr;
+    opacity:1;
+  }
+
+  body.intro .col-left,
+  body.intro .col-right{
+    opacity:0;
+    transform:translateY(20px);
+    pointer-events:none;
+  }
+
+  body.intro .stage{
+    min-height:calc(100vh - 140px);
+    align-items:center;
+  }
+
+  body.intro .center-controls{
+    opacity:0;
+    transform:translateY(10px);
+    pointer-events:none;
+  }
+
+  body.intro .sphere-logo{
+    opacity:1;
+    transform:scale(1.05);
+  }
+
+  /* Large sphere + pulse animation */
+  body.intro .sphere-wrapper{
+    /* starting scale; animation will override */
+  }
+
+  .sphere-wrapper.intro-pulse{
+    animation:introPulse 2.6s ease-in-out forwards;
+  }
+
+  @keyframes introPulse{
+    0%   { transform:scale(1.8); }
+    20%  { transform:scale(2.1); }
+    40%  { transform:scale(1.8); }
+    60%  { transform:scale(2.1); }
+    80%  { transform:scale(1.8); }
+    100% { transform:scale(1); }
+  }
+
+  /* When intro ends (body no longer has .intro), everything fades in */
 </style>
 </head>
-<body>
+<body class="intro">
 
 <!-- HEADER -->
 <div class="header-wrap">
@@ -458,6 +530,8 @@
     <div class="stage">
       <div class="sphere-wrapper">
         <canvas id="fog" width="520" height="520"></canvas>
+        <!-- logo inside the sphere for intro -->
+        <img src="logo.png" alt="LUMI logo inside sphere" class="sphere-logo" />
       </div>
     </div>
     <div class="center-controls">
@@ -683,6 +757,8 @@ const answerBtn = document.getElementById('answerBtn');
 
 const personaSelect = document.getElementById('personaSelect');
 const topicSelect = document.getElementById('topicSelect');
+const sphereWrapper = document.querySelector('.sphere-wrapper');
+const sphereLogo = document.querySelector('.sphere-logo');
 
 /* ========= Conversation rendering ========= */
 let conversation = [];
@@ -768,7 +844,7 @@ async function sendMessageToPersona(text, mode='answer'){
   const payload = {
     sessionId: SESSION_ID,
     text,
-    persona: getPersonaKey(),     // for {{ $json.persona }}
+    persona: getPersonaKey(),
     difficulty: getDifficulty(),
     topic: getTopic(),
     mode
@@ -787,9 +863,9 @@ async function requestFeedback(){
   feedbackBox.textContent = 'Scoring session…';
   const payload = {
     sessionId: SESSION_ID,
-    persona: 'score',   // <-- make sure your Switch has a branch for this
+    persona: 'score',
     mode: 'score',
-    text: 'Please score the current session and return feedback.'  // <-- NEW
+    text: 'Please score the current session and return feedback.'
   };
   const data = await callN8N(payload);
   const fb = data.feedback || data.reply || data.message || '(no feedback returned)';
@@ -882,7 +958,7 @@ pauseBtn.addEventListener('click', () => {
 
 restartBtn.addEventListener('click', () => {
   speechSynthesis.cancel();
-  resetSessionId();          // new memory session
+  resetSessionId();
   conversation = [];
   renderTranscript();
   feedbackPanel.style.display = 'none';
@@ -910,6 +986,22 @@ document.addEventListener('click', (e) => {
   if (!menuPanel.contains(e.target) && !menuBtn.contains(e.target)){
     menuPanel.classList.remove('open');
   }
+});
+
+/* ========= INTRO ANIMATION ========= */
+window.addEventListener('load', () => {
+  // start big pulse animation
+  sphereWrapper.classList.add('intro-pulse');
+
+  // after pulse, fade out sphere-logo + show UI
+  setTimeout(() => {
+    // logo inside sphere fades "up" (via CSS transform/opacity)
+    sphereLogo.style.opacity = '0';
+    sphereLogo.style.transform = 'translateY(-40px) scale(0.7)';
+
+    // remove intro class so header + panels slide/fade in
+    document.body.classList.remove('intro');
+  }, 2600); // match introPulse duration
 });
 </script>
 </body>
