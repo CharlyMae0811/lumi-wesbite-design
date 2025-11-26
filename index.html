@@ -1054,6 +1054,45 @@ async function sendMessageToPersona(text, mode='answer'){
   speak(msg);
   confirmBtn.disabled = false;
 }
+function extractScoreData(raw) {
+  // Case 1: already a proper object with overall_score
+  if (raw && typeof raw === 'object' && ('overall_score' in raw || 'feedback' in raw)) {
+    return raw.feedback || raw;
+  }
+
+  // Case 2: n8n wrapped it as { output: "```json\n{...}\n```" }
+  if (raw && typeof raw === 'object' && typeof raw.output === 'string') {
+    let s = raw.output.trim();
+
+    // strip ```json ... ``` fences if present
+    if (s.startsWith('```')) {
+      s = s.replace(/^```[a-zA-Z]*\n?/, '').replace(/```$/, '');
+    }
+
+    try {
+      return JSON.parse(s);
+    } catch (e) {
+      console.error('Could not parse score JSON from output:', e, s);
+      return null;
+    }
+  }
+
+  // Case 3: raw is directly a string with the JSON in it
+  if (typeof raw === 'string') {
+    let s = raw.trim();
+    if (s.startsWith('```')) {
+      s = s.replace(/^```[a-zA-Z]*\n?/, '').replace(/```$/, '');
+    }
+    try {
+      return JSON.parse(s);
+    } catch (e) {
+      console.error('Could not parse score JSON:', e, s);
+      return null;
+    }
+  }
+
+  return null;
+}
 
 async function requestFeedback(){
   feedbackPanel.style.display = 'block';
@@ -1068,11 +1107,11 @@ async function requestFeedback(){
     text: 'Please score the current session and return feedback.'
   };
 
-  const data = await callN8N(payload);
-  const scoreData = data.feedback || data; // works for {feedback:{...}} or plain JSON
+  const raw = await callN8N(payload);
+  const scoreData = extractScoreData(raw);
 
-  if (!scoreData || typeof scoreData !== 'object') {
-    if (summaryEl) summaryEl.textContent = 'No structured scoring data returned.';
+  if (!scoreData) {
+    if (summaryEl) summaryEl.textContent = 'Could not parse scoring data.';
     return;
   }
 
