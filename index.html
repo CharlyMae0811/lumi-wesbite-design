@@ -1032,41 +1032,71 @@ async function sendMessageToPersona(text, mode='answer'){
 }
 
 /* === scoring data extraction (handles ```json fences) === */
-function extractScoreData(raw){
-  // if n8n returned [{ reply: "```json\n{...}\n```" }]
-  if (Array.isArray(raw) && raw.length && typeof raw[0].reply === 'string') {
-    let s = raw[0].reply.trim();
-    if (s.startsWith('```')) {
-      s = s.replace(/^```[a-zA-Z]*\n?/, '').replace(/```$/, '');
+/* === scoring data extraction (handles arrays + ```json fences) === */
+function extractScoreData(raw) {
+  console.log('raw feedback from n8n:', raw);
+
+  // If n8n returned an array like [ { reply: "```json\n{...}\n```" } ]
+  if (Array.isArray(raw) && raw.length > 0) {
+    raw = raw[0];
+  }
+
+  // Already a structured object
+  if (raw && typeof raw === 'object') {
+    if (raw.feedback && typeof raw.feedback === 'object') {
+      return raw.feedback;
     }
-    try {
-      return JSON.parse(s);
-    } catch (e) {
-      console.error('JSON parse error from reply string:', e, s);
-      return null;
+    if (typeof raw.overall_score === 'number') {
+      return raw;
     }
   }
 
-  // already an object with overall_score etc
-  if (raw && typeof raw === 'object' && ('overall_score' in raw || 'feedback' in raw)) {
-    return raw.feedback || raw;
+  // Find the text field that actually holds the JSON string
+  let text = null;
+  if (raw && typeof raw === 'object') {
+    if (typeof raw.reply === 'string') text = raw.reply;
+    else if (typeof raw.output === 'string') text = raw.output;
+  } else if (typeof raw === 'string') {
+    text = raw;
   }
 
-  // plain string
-  if (typeof raw === 'string') {
-    let s = raw.trim();
-    if (s.startsWith('```')) {
-      s = s.replace(/^```[a-zA-Z]*\n?/, '').replace(/```$/, '');
-    }
-    try {
-      return JSON.parse(s);
-    } catch (e) {
-      console.error('JSON parse error from string:', e, s);
-      return null;
-    }
+  if (!text) {
+    console.warn('No reply/output string found in scoring payload:', raw);
+    return null;
   }
 
-  return null;
+  let s = text.trim();
+
+  // Strip ```json ... ``` fences if present
+  if (s.startsWith('```')) {
+    // Remove first line (``` or ```json)
+    const firstNewline = s.indexOf('\n');
+    if (firstNewline !== -1) {
+      s = s.slice(firstNewline + 1);
+    }
+    // Remove trailing ```
+    const lastFence = s.lastIndexOf('```');
+    if (lastFence !== -1) {
+      s = s.slice(0, lastFence);
+    }
+    s = s.trim();
+  }
+
+  // As a safety net, cut to the substring between the first { and last }
+  const firstBrace = s.indexOf('{');
+  const lastBrace  = s.lastIndexOf('}');
+  if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
+    s = s.slice(firstBrace, lastBrace + 1);
+  }
+
+  try {
+    const parsed = JSON.parse(s);
+    console.log('parsed score data:', parsed);
+    return parsed;
+  } catch (e) {
+    console.error('Could not parse score JSON:', e, s);
+    return null;
+  }
 }
 
 async function requestFeedback(){
@@ -1086,12 +1116,15 @@ async function requestFeedback(){
   const scoreData = extractScoreData(raw);
 
   if (!scoreData) {
-    if (summaryEl) summaryEl.textContent = 'Could not parse scoring data.';
+    if (summaryEl) {
+      summaryEl.textContent = 'Could not parse scoring data (check console for details).';
+    }
     return;
   }
 
   updateScoreUI(scoreData);
 }
+
 
 /* ========= SCORE UI UPDATE ========= */
 function updateScoreUI(scoreData){
