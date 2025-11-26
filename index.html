@@ -184,7 +184,7 @@
       drop-shadow(0 0 70px rgba(180,140,255,.95));
     opacity:0;
     pointer-events:none;
-    transition: opacity .3s ease;  /* <--- changed */
+    transition: opacity .3s ease;
   }
 
   .center-controls{
@@ -383,8 +383,8 @@
     border: 1px solid rgba(255,255,255,0.05);
     box-shadow: 0 0 12px rgba(124,211,255,0.4);
   }
-    /* ===== SESSION SCORE UI ===== */
 
+  /* ===== SESSION SCORE UI ===== */
   .score-layout{
     display:flex;
     flex-direction:column;
@@ -400,51 +400,20 @@
 
   .score-ring{
     position:relative;
-    width:140px;   /* a bit larger */
+    width:140px;
     height:140px;
-  }
-  .score-ring svg{
-    width:100%;
-    height:100%;
-    transform:rotate(-90deg);
-  }
-  .score-ring-bg{
-    stroke:rgba(124,211,255,0.2);
-    stroke-width:8;
-    fill:none;
-  }
-  .score-ring-fg{
-    stroke:url(#scoreGradient);
-    stroke-width:8;
-    fill:none;
-    stroke-linecap:round;
-    stroke-dasharray: 289;      /* will be overwritten in JS */
-    stroke-dashoffset: 289;     /* start empty */
-    transition:stroke-dashoffset 1s ease;
-  }
-
-  .score-number{
-    position:absolute;
-    inset:0;
     display:flex;
-    flex-direction:column;
     align-items:center;
     justify-content:center;
+    font-size:26px;
     font-weight:600;
   }
-  .score-number span:first-child{
+
+  .score-ring-value{
     font-size:26px;
   }
-  .score-number .score-max{
-    font-size:11px;
-    color:var(--text-soft);
-  }
-
-  .score-label{
-    position:absolute;
-    bottom:-18px;
-    width:100%;
-    text-align:center;
+  .score-ring-label{
+    margin-top:4px;
     font-size:11px;
     color:var(--accent);
   }
@@ -462,21 +431,26 @@
     gap:6px;
   }
 
-  /* sub-score bars */
-  .score-bars{
+  .scores-breakdown{
     display:flex;
     flex-direction:column;
     gap:6px;
     font-size:11px;
   }
-  .score-bar{
+  .score-row{
     display:flex;
     align-items:center;
     gap:6px;
   }
-  .score-bar-label{
+  .score-row-label{
     flex:0 0 120px;
     color:var(--text-soft);
+  }
+  .score-bar{
+    display:flex;
+    flex:1;
+    align-items:center;
+    gap:6px;
   }
   .score-bar-track{
     flex:1;
@@ -491,54 +465,51 @@
     width:0;
     transition:width .9s ease;
   }
-  .score-bar-score{
-    width:40px;
+  .score-row-value{
+    width:52px;
     text-align:right;
     font-size:10px;
     color:var(--text-soft);
   }
 
-  /* subtle Lumi colour variations */
-  .score-bars .score-bar:nth-child(1) .score-bar-fill{
+  .scores-breakdown .score-row:nth-child(1) .score-bar-fill{
     background:linear-gradient(90deg,#7cd3ff,#a88cff);
   }
-  .score-bars .score-bar:nth-child(2) .score-bar-fill{
+  .scores-breakdown .score-row:nth-child(2) .score-bar-fill{
     background:linear-gradient(90deg,#8fd6ff,#b98cff);
   }
-  .score-bars .score-bar:nth-child(3) .score-bar-fill{
+  .scores-breakdown .score-row:nth-child(3) .score-bar-fill{
     background:linear-gradient(90deg,#9ee2ff,#c58cff);
   }
-  .score-bars .score-bar:nth-child(4) .score-bar-fill{
+  .scores-breakdown .score-row:nth-child(4) .score-bar-fill{
     background:linear-gradient(90deg,#7fc4ff,#b28cff);
   }
-  .score-bars .score-bar:nth-child(5) .score-bar-fill{
+  .scores-breakdown .score-row:nth-child(5) .score-bar-fill{
     background:linear-gradient(90deg,#73b9ff,#a38cff);
   }
 
-  /* wins / next steps */
-  .score-feedback{
+  .score-feedback-columns{
     display:flex;
     flex-wrap:wrap;
     gap:10px;
     margin-top:4px;
   }
-  .score-feedback-col{
+  .score-column{
     flex:1 1 160px;
   }
-  .score-feedback-col h4{
+  .score-column h4{
     margin:0 0 4px 0;
     font-size:11px;
-    color:var(--text-soft);
     text-transform:uppercase;
     letter-spacing:.05em;
   }
-  .score-feedback-col ul{
+  .score-column ul{
     margin:0;
     padding-left:14px;
     font-size:11px;
     line-height:1.3;
   }
-  .score-feedback-col li{
+  .score-column li{
     margin-bottom:2px;
   }
 
@@ -575,8 +546,8 @@
     pointer-events:none;
   }
 
-   body.intro .app{
-    opacity:1;           /* just make sure it’s visible */
+  body.intro .app{
+    opacity:1;
   }
 
   body.intro .col-left,
@@ -597,41 +568,23 @@
     transform:scale(1.05);
   }
 
-/* Large sphere position in intro */
-body.intro .sphere-wrapper {
-  margin-top: 40px;
-}
+  body.intro .sphere-wrapper {
+    margin-top: 40px;
+  }
 
-/* Smooth, big intro pulse */
-.sphere-wrapper.intro-pulse {
-  animation: introPulse 4s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
-  transform-origin: center center;
-}
+  .sphere-wrapper.intro-pulse {
+    animation: introPulse 4s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+    transform-origin: center center;
+  }
 
-/* Smooth multi-pulse: starts ~40% bigger, gently settles */
-@keyframes introPulse {
-  0% {
-    transform: scale(1.4);    /* ~40% bigger */
+  @keyframes introPulse {
+    0% { transform: scale(1.4); }
+    20%{ transform: scale(1.55); }
+    40%{ transform: scale(1.45); }
+    60%{ transform: scale(1.52); }
+    80%{ transform: scale(1.42); }
+    100%{ transform: scale(1.0); }
   }
-  20% {
-    transform: scale(1.55);   /* first soft peak */
-  }
-  40% {
-    transform: scale(1.45);   /* relax a bit */
-  }
-  60% {
-    transform: scale(1.52);   /* second pulse */
-  }
-  80% {
-    transform: scale(1.42);   /* settle down */
-  }
-  100% {
-    transform: scale(1.0);    /* final normal size */
-  }
-}
-
-
-  /* When intro ends (body no longer has .intro), everything fades in */
 </style>
 </head>
 <body class="intro">
@@ -748,44 +701,42 @@ body.intro .sphere-wrapper {
     </div>
 
     <div id="feedbackPanel" class="panel" style="margin-top:12px; display:none;">
-  <h3>Session feedback</h3>
-  <p class="panel-subtitle">Automated coaching summary from the scoring agent.</p>
+      <h3>Session feedback</h3>
+      <p class="panel-subtitle">Automated coaching summary from the scoring agent.</p>
 
-  <div class="score-layout" style="margin-top:12px;">
+      <div class="score-layout" style="margin-top:12px;">
 
-      <!-- MAIN RING SCORE -->
-      <div class="score-main" style="text-align:center;margin-bottom:18px;">
-        <div id="scoreRing" class="score-ring">
-          <div class="score-ring-inner">
-            <div id="scoreRingValue" class="score-ring-value">--</div>
-            <div id="scoreRingLabel" class="score-ring-label">Awaiting score…</div>
+        <!-- MAIN SCORE -->
+        <div class="score-main" style="text-align:center;margin-bottom:18px;">
+          <div id="scoreRing" class="score-ring">
+            <div>
+              <div id="scoreRingValue" class="score-ring-value">--</div>
+              <div id="scoreRingLabel" class="score-ring-label">Awaiting score…</div>
+            </div>
           </div>
+          <p id="scoreSummary" class="score-summary" style="margin-top:10px;font-size:12px;opacity:.9;">
+            Click "Give me feedback" after a call to generate analysis.
+          </p>
         </div>
-        <p id="scoreSummary" class="score-summary" style="margin-top:10px;font-size:12px;opacity:.9;">
-          Click "Give me feedback" after a call to generate analysis.
-        </p>
-      </div>
 
-      <!-- 5 SCORE BARS -->
-      <div id="scoresBreakdown" class="scores-breakdown" style="margin-top:14px;margin-bottom:16px;">
-        <!-- JS will inject rows here dynamically -->
-      </div>
+        <!-- SUB SCORES -->
+        <div id="scoresBreakdown" class="scores-breakdown" style="margin-top:14px;margin-bottom:16px;">
+          <!-- JS injects rows -->
+        </div>
 
-      <!-- WINS + NEXT STEPS SIDE-BY-SIDE -->
-      <div class="score-feedback-columns" style="display:flex;gap:18px;margin-top:10px;flex-wrap:wrap;">
-
-        <div class="score-column" style="flex:1;min-width:150px;">
+        <!-- WINS + NEXT STEPS -->
+        <div class="score-feedback-columns" style="gap:18px;margin-top:10px;flex-wrap:wrap;">
+          <div class="score-column" style="flex:1;min-width:150px;">
             <h4 style="margin:0 0 6px 0;font-size:13px;color:#8ecfff;">What you did well</h4>
             <ul id="winsList" style="margin:0;padding-left:16px;font-size:12px;line-height:1.3;"></ul>
-        </div>
-
-        <div class="score-column" style="flex:1;min-width:150px;">
+          </div>
+          <div class="score-column" style="flex:1;min-width:150px;">
             <h4 style="margin:0 0 6px 0;font-size:13px;color:#ffb4f8;">What to improve next</h4>
             <ul id="nextStepsList" style="margin:0;padding-left:16px;font-size:12px;line-height:1.3;"></ul>
+          </div>
         </div>
       </div>
-  </div>
-</div>
+    </div>
 
   </div>
 </div>
@@ -1054,39 +1005,46 @@ async function sendMessageToPersona(text, mode='answer'){
   speak(msg);
   confirmBtn.disabled = false;
 }
+
+/* ========= SCORING ========= */
+
+// normalise whatever n8n sends into a clean score object
 function extractScoreData(raw) {
-  // Case 1: already a proper object with overall_score
-  if (raw && typeof raw === 'object' && ('overall_score' in raw || 'feedback' in raw)) {
-    return raw.feedback || raw;
+  console.log('RAW from n8n score webhook:', raw);
+
+  if (!raw) return null;
+
+  // direct object (webhook already returns the JSON)
+  if (typeof raw === 'object') {
+    if (raw.overall_score !== undefined || raw.rating || raw.dimensions || raw.wins || raw.next_steps) {
+      return raw;
+    }
+    if (raw.feedback && typeof raw.feedback === 'object') {
+      return raw.feedback;
+    }
+    if (typeof raw.output === 'string') {
+      let s = raw.output.trim();
+      if (s.startsWith('```')) {
+        s = s.replace(/^```[a-zA-Z]*\s*/i, '').replace(/```$/, '');
+      }
+      try {
+        return JSON.parse(s);
+      } catch (e) {
+        console.error('Could not parse score JSON from output:', e, s);
+        return null;
+      }
+    }
   }
 
-  // Case 2: n8n wrapped it as { output: "```json\n{...}\n```" }
-  if (raw && typeof raw === 'object' && typeof raw.output === 'string') {
-    let s = raw.output.trim();
-
-    // strip ```json ... ``` fences if present
-    if (s.startsWith('```')) {
-      s = s.replace(/^```[a-zA-Z]*\n?/, '').replace(/```$/, '');
-    }
-
-    try {
-      return JSON.parse(s);
-    } catch (e) {
-      console.error('Could not parse score JSON from output:', e, s);
-      return null;
-    }
-  }
-
-  // Case 3: raw is directly a string with the JSON in it
   if (typeof raw === 'string') {
     let s = raw.trim();
     if (s.startsWith('```')) {
-      s = s.replace(/^```[a-zA-Z]*\n?/, '').replace(/```$/, '');
+      s = s.replace(/^```[a-zA-Z]*\s*/i, '').replace(/```$/, '');
     }
     try {
       return JSON.parse(s);
     } catch (e) {
-      console.error('Could not parse score JSON:', e, s);
+      console.error('Could not parse score JSON from string:', e, s);
       return null;
     }
   }
@@ -1097,7 +1055,12 @@ function extractScoreData(raw) {
 async function requestFeedback(){
   feedbackPanel.style.display = 'block';
 
+  const ringValue = document.getElementById('scoreRingValue');
+  const ringLabel = document.getElementById('scoreRingLabel');
   const summaryEl = document.getElementById('scoreSummary');
+
+  if (ringValue) ringValue.textContent = '--';
+  if (ringLabel) ringLabel.textContent = 'Scoring session…';
   if (summaryEl) summaryEl.textContent = 'Scoring session…';
 
   const payload = {
@@ -1118,50 +1081,51 @@ async function requestFeedback(){
   updateScoreUI(scoreData);
 }
 
+function updateScoreUI(scoreData){
+  console.log('updateScoreUI with:', scoreData);
 
-  function updateScoreUI(scoreData){
-  // 1) Overall ring
-  const overall = Number(scoreData.overall_score ?? 0);
-  const clamped = Math.max(0, Math.min(100, overall));
+  const overall  = Number(scoreData.overall_score ?? 0);
+  const clamped  = Math.max(0, Math.min(100, overall));
+  const rating   = scoreData.rating || '';
+  const summary  = scoreData.summary || '';
+  const dims     = Array.isArray(scoreData.dimensions) ? scoreData.dimensions : [];
+  const wins     = Array.isArray(scoreData.wins) ? scoreData.wins : [];
+  const next     = Array.isArray(scoreData.next_steps) ? scoreData.next_steps : [];
 
-  const ring       = document.getElementById('scoreRing');
-  const ringNumber = document.getElementById('scoreRingValue');
-  const ringLabel  = document.getElementById('scoreRingLabel');
-  const summaryEl  = document.getElementById('scoreSummary');
+  const ringValue = document.getElementById('scoreRingValue');
+  const ringLabel = document.getElementById('scoreRingLabel');
+  const summaryEl = document.getElementById('scoreSummary');
 
-  // animate ring via SVG circle if you add one, or just set the number for now
-  if (ringNumber) ringNumber.textContent = clamped.toString();
-  if (ringLabel)  ringLabel.textContent  = scoreData.rating || '';
-  if (summaryEl)  summaryEl.textContent  = scoreData.summary || '';
+  if (ringValue) ringValue.textContent = clamped.toString();
+  if (ringLabel) ringLabel.textContent = rating;
+  if (summaryEl) summaryEl.textContent = summary || 'Session scored.';
 
-  // 2) Sub-scores
   const breakdown = document.getElementById('scoresBreakdown');
-  if (breakdown && Array.isArray(scoreData.dimensions)) {
+  if (breakdown) {
     breakdown.innerHTML = '';
-
-    scoreData.dimensions.forEach((dim, idx) => {
+    dims.forEach((dim) => {
       const percent = dim.max_score ? Math.round((dim.score / dim.max_score) * 100) : 0;
-
       const row = document.createElement('div');
       row.className = 'score-row';
       row.innerHTML = `
         <div class="score-row-label">${dim.name}</div>
         <div class="score-bar">
-          <div class="score-bar-fill score-bar-fill-${idx+1}" style="width:${percent}%"></div>
+          <div class="score-bar-track">
+            <div class="score-bar-fill" style="width:${percent}%"></div>
+          </div>
+          <div class="score-row-value">${dim.score} / ${dim.max_score}</div>
         </div>
-        <div class="score-row-value">${dim.score} / ${dim.max_score}</div>
       `;
       breakdown.appendChild(row);
     });
   }
 
-  // 3) Wins & next steps
   const winsList = document.getElementById('winsList');
   const nextList = document.getElementById('nextStepsList');
 
   if (winsList) {
     winsList.innerHTML = '';
-    (scoreData.wins || []).forEach(w => {
+    wins.forEach(w => {
       const li = document.createElement('li');
       li.textContent = w;
       winsList.appendChild(li);
@@ -1170,7 +1134,7 @@ async function requestFeedback(){
 
   if (nextList) {
     nextList.innerHTML = '';
-    (scoreData.next_steps || []).forEach(n => {
+    next.forEach(n => {
       const li = document.createElement('li');
       li.textContent = n;
       nextList.appendChild(li);
@@ -1178,60 +1142,24 @@ async function requestFeedback(){
   }
 }
 
+function resetScoreUI() {
+  const ringValue   = document.getElementById('scoreRingValue');
+  const ringLabel   = document.getElementById('scoreRingLabel');
+  const summaryEl   = document.getElementById('scoreSummary');
+  const breakdown   = document.getElementById('scoresBreakdown');
+  const winsList    = document.getElementById('winsList');
+  const nextSteps   = document.getElementById('nextStepsList');
 
- feedbackPanel.style.display = 'none';
-const summaryEl = document.getElementById('scoreSummary');
-if (summaryEl) {
-  summaryEl.textContent = 'Click "Give me feedback" after a call to generate analysis.';
-}
-
-
-
-
-
-function animateScoreRing(score, circumference, rating){
-  const clamped = Math.max(0, Math.min(100, score|0));
-  const circle  = feedbackBox.querySelector('.score-ring-fg');
-  const valueEl = feedbackBox.querySelector('#scoreValue');
-  const labelEl = feedbackBox.querySelector('#scoreLabel');
-  if (!circle || !valueEl) return;
-
-  if (labelEl) labelEl.textContent = rating || '';
-
-  const targetOffset = circumference * (1 - clamped/100);
-
-  // animate ring fill
-  circle.style.transition = 'stroke-dashoffset 1s ease';
-  requestAnimationFrame(() => {
-    circle.style.strokeDashoffset = targetOffset;
-  });
-
-  // animate number count-up
-  const start     = 0;
-  const duration  = 900;
-  const startTime = performance.now();
-  function tick(now){
-    const p   = Math.min(1, (now - startTime) / duration);
-    const val = Math.round(start + (clamped - start)*p);
-    valueEl.textContent = val;
-    if (p < 1) requestAnimationFrame(tick);
+  if (ringValue) ringValue.textContent = '--';
+  if (ringLabel) ringLabel.textContent = 'Awaiting score…';
+  if (summaryEl) {
+    summaryEl.textContent =
+      'Click "Give me feedback" after a call to generate analysis.';
   }
-  requestAnimationFrame(tick);
+  if (breakdown) breakdown.innerHTML = '';
+  if (winsList)  winsList.innerHTML  = '';
+  if (nextSteps) nextSteps.innerHTML = '';
 }
-
-function animateBars(){
-  const fills = feedbackBox.querySelectorAll('.score-bar-fill');
-  fills.forEach(f => {
-    const max = Number(f.dataset.max) || 20;
-    const val = Number(f.dataset.val) || 0;
-    const pct = Math.max(0, Math.min(100, (val / max) * 100));
-    f.style.width = '0%';
-    requestAnimationFrame(() => {
-      f.style.width = pct + '%';
-    });
-  });
-}
-
 
 /* ========= STT: hold-to-talk ========= */
 let rec, recognizing = false;
@@ -1285,8 +1213,6 @@ confirmBtn.addEventListener('click', () => {
   sendMessageToPersona(t, 'answer');
 });
 
-
-
 feedbackBtn.addEventListener('click', () => {
   requestFeedback();
 });
@@ -1312,25 +1238,6 @@ pauseBtn.addEventListener('click', () => {
   }
 });
 
-function resetScoreUI() {
-  const ringValue   = document.getElementById('scoreRingValue');
-  const ringLabel   = document.getElementById('scoreRingLabel');
-  const summaryEl   = document.getElementById('scoreSummary');
-  const breakdown   = document.getElementById('scoresBreakdown');
-  const winsList    = document.getElementById('winsList');
-  const nextSteps   = document.getElementById('nextStepsList');
-
-  if (ringValue) ringValue.textContent = '--';
-  if (ringLabel) ringLabel.textContent = 'Awaiting score…';
-  if (summaryEl) {
-    summaryEl.textContent =
-      'Click "Give me feedback" after a call to generate analysis.';
-  }
-  if (breakdown) breakdown.innerHTML = '';
-  if (winsList)  winsList.innerHTML  = '';
-  if (nextSteps) nextSteps.innerHTML = '';
-}
-
 clearBtn.addEventListener('click', () => {
   conversation = [];
   renderTranscript();
@@ -1346,7 +1253,6 @@ restartBtn.addEventListener('click', () => {
   feedbackPanel.style.display = 'none';
   resetScoreUI();
 });
-
 
 // Hint / Answer-for-me buttons
 hintBtn.addEventListener('click', () => {
@@ -1371,20 +1277,13 @@ document.addEventListener('click', (e) => {
   }
 });
 
-
 /* ========= INTRO ANIMATION ========= */
 window.addEventListener('load', () => {
-  // start big pulse animation
   sphereWrapper.classList.add('intro-pulse');
-
-  // after pulse, fade out sphere-logo + show UI
   setTimeout(() => {
-    // logo inside sphere fades "up" (via CSS transform/opacity)
     sphereLogo.style.opacity = '0';
-
-    // remove intro class so header + panels slide/fade in
     document.body.classList.remove('intro');
-  }, 4000); // match introPulse duration
+  }, 4000);
 });
 </script>
 </body>
