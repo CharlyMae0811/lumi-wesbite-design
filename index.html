@@ -944,7 +944,6 @@ const confirmBtn = document.getElementById('confirmBtn');
 const clearBtn = document.getElementById('clearBtn');
 const feedbackBtn = document.getElementById('feedbackBtn');
 const feedbackPanel = document.getElementById('feedbackPanel');
-const feedbackBox = document.getElementById('feedbackBox');
 const dialogueEl = document.getElementById('dialogueTranscript');
 
 const playBtn = document.getElementById('playBtn');
@@ -1058,7 +1057,9 @@ async function sendMessageToPersona(text, mode='answer'){
 
 async function requestFeedback(){
   feedbackPanel.style.display = 'block';
-  feedbackBox.textContent = 'Scoring session…';
+
+  const summaryEl = document.getElementById('scoreSummary');
+  if (summaryEl) summaryEl.textContent = 'Scoring session…';
 
   const payload = {
     sessionId: SESSION_ID,
@@ -1068,17 +1069,16 @@ async function requestFeedback(){
   };
 
   const data = await callN8N(payload);
-
-  // If you return the JSON exactly like you pasted:
-  const scoreData = data.feedback || data;   // support both plain or { feedback: { ... } }
+  const scoreData = data.feedback || data; // works for {feedback:{...}} or plain JSON
 
   if (!scoreData || typeof scoreData !== 'object') {
-    feedbackBox.textContent = 'No structured scoring data returned.';
+    if (summaryEl) summaryEl.textContent = 'No structured scoring data returned.';
     return;
   }
 
   updateScoreUI(scoreData);
 }
+
 
   function updateScoreUI(scoreData){
   // 1) Overall ring
@@ -1141,16 +1141,18 @@ async function requestFeedback(){
     });
   }
 
-  // Optional: remove the plain text "Scoring session…" message
-  feedbackBox.textContent = '';
+ feedbackPanel.style.display = 'none';
+const summaryEl = document.getElementById('scoreSummary');
+if (summaryEl) {
+  summaryEl.textContent = 'Click "Give me feedback" after a call to generate analysis.';
 }
+
 
 
 function renderFeedback(rawData){
   // n8n might return { feedback: {...} } or just {...}
   const fb = rawData.feedback || rawData;
   if (!fb || typeof fb !== 'object'){
-    feedbackBox.textContent = typeof fb === 'string'
       ? fb
       : 'No structured feedback returned.';
     return;
