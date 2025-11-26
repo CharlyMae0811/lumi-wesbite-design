@@ -1085,23 +1085,20 @@ async function requestFeedback(){
   const overall = Number(scoreData.overall_score ?? 0);
   const clamped = Math.max(0, Math.min(100, overall));
 
-  const ring = document.getElementById('scoreRing');
+  const ring       = document.getElementById('scoreRing');
   const ringNumber = document.getElementById('scoreRingValue');
-  const ringLabel = document.getElementById('scoreRingLabel');
-  const summaryEl = document.getElementById('scoreSummary');
+  const ringLabel  = document.getElementById('scoreRingLabel');
+  const summaryEl  = document.getElementById('scoreSummary');
 
-  if (ring) {
-    // animate the ring fill via CSS variable --score (0–1)
-    ring.style.setProperty('--score', clamped / 100);
-  }
+  // animate ring via SVG circle if you add one, or just set the number for now
   if (ringNumber) ringNumber.textContent = clamped.toString();
-  if (ringLabel)  ringLabel.textContent = scoreData.rating || '';
-  if (summaryEl)  summaryEl.textContent = scoreData.summary || '';
+  if (ringLabel)  ringLabel.textContent  = scoreData.rating || '';
+  if (summaryEl)  summaryEl.textContent  = scoreData.summary || '';
 
   // 2) Sub-scores
   const breakdown = document.getElementById('scoresBreakdown');
   if (breakdown && Array.isArray(scoreData.dimensions)) {
-    breakdown.innerHTML = ''; // clear old
+    breakdown.innerHTML = '';
 
     scoreData.dimensions.forEach((dim, idx) => {
       const percent = dim.max_score ? Math.round((dim.score / dim.max_score) * 100) : 0;
@@ -1140,6 +1137,8 @@ async function requestFeedback(){
       nextList.appendChild(li);
     });
   }
+}
+
 
  feedbackPanel.style.display = 'none';
 const summaryEl = document.getElementById('scoreSummary');
@@ -1149,84 +1148,7 @@ if (summaryEl) {
 
 
 
-function renderFeedback(rawData){
-  // n8n might return { feedback: {...} } or just {...}
-  const fb = rawData.feedback || rawData;
-  if (!fb || typeof fb !== 'object'){
-      ? fb
-      : 'No structured feedback returned.';
-    return;
-  }
 
-  const overall = fb.overall_score ?? 0;
-  const rating  = fb.rating || '';
-  const summary = fb.summary || '';
-  const dims    = Array.isArray(fb.dimensions) ? fb.dimensions : [];
-  const wins    = Array.isArray(fb.wins) ? fb.wins : [];
-  const next    = Array.isArray(fb.next_steps) ? fb.next_steps : [];
-
-  const circumference = 2 * Math.PI * 46; // r=46 in SVG
-
-  const html = `
-    <div class="score-layout">
-      <div class="score-main">
-        <div class="score-ring">
-          <svg viewBox="0 0 100 100">
-            <defs>
-              <linearGradient id="scoreGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stop-color="#7cd3ff"/>
-                <stop offset="100%" stop-color="#a88cff"/>
-              </linearGradient>
-            </defs>
-            <circle class="score-ring-bg" cx="50" cy="50" r="46" />
-            <circle class="score-ring-fg" cx="50" cy="50" r="46"
-              stroke-dasharray="${circumference}"
-              stroke-dashoffset="${circumference}" />
-          </svg>
-          <div class="score-number">
-            <span id="scoreValue">0</span><span class="score-max">/100</span>
-          </div>
-          <div class="score-label" id="scoreLabel"></div>
-        </div>
-      </div>
-      ${summary ? `<p class="score-summary">${summary}</p>` : ''}
-      <div class="score-details">
-        <div class="score-bars">
-          ${dims.map(d => `
-            <div class="score-bar">
-              <div class="score-bar-label">${d.name}</div>
-              <div class="score-bar-track">
-                <div class="score-bar-fill"
-                     data-max="${d.max_score || 20}"
-                     data-val="${d.score || 0}"></div>
-              </div>
-              <div class="score-bar-score">${d.score ?? 0}/${d.max_score || 20}</div>
-            </div>
-          `).join('')}
-        </div>
-        <div class="score-feedback">
-          <div class="score-feedback-col">
-            <h4>What you did well</h4>
-            <ul>
-              ${wins.map(w => `<li>${w}</li>`).join('')}
-            </ul>
-          </div>
-          <div class="score-feedback-col">
-            <h4>What to improve</h4>
-            <ul>
-              ${next.map(n => `<li>${n}</li>`).join('')}
-            </ul>
-          </div>
-        </div>
-      </div>
-    </div>
-  `;
-
-  feedbackBox.innerHTML = html;
-
-  animateScoreRing(overall, circumference, rating);
-  animateBars();
-}
 
 function animateScoreRing(score, circumference, rating){
   const clamped = Math.max(0, Math.min(100, score|0));
@@ -1324,12 +1246,7 @@ confirmBtn.addEventListener('click', () => {
   sendMessageToPersona(t, 'answer');
 });
 
-clearBtn.addEventListener('click', () => {
-  conversation = [];
-  renderTranscript();
-  feedbackPanel.style.display = 'none';
-  feedbackBox.textContent = '';
-});
+
 
 feedbackBtn.addEventListener('click', () => {
   requestFeedback();
@@ -1356,14 +1273,41 @@ pauseBtn.addEventListener('click', () => {
   }
 });
 
+function resetScoreUI() {
+  const ringValue   = document.getElementById('scoreRingValue');
+  const ringLabel   = document.getElementById('scoreRingLabel');
+  const summaryEl   = document.getElementById('scoreSummary');
+  const breakdown   = document.getElementById('scoresBreakdown');
+  const winsList    = document.getElementById('winsList');
+  const nextSteps   = document.getElementById('nextStepsList');
+
+  if (ringValue) ringValue.textContent = '--';
+  if (ringLabel) ringLabel.textContent = 'Awaiting score…';
+  if (summaryEl) {
+    summaryEl.textContent =
+      'Click "Give me feedback" after a call to generate analysis.';
+  }
+  if (breakdown) breakdown.innerHTML = '';
+  if (winsList)  winsList.innerHTML  = '';
+  if (nextSteps) nextSteps.innerHTML = '';
+}
+
+clearBtn.addEventListener('click', () => {
+  conversation = [];
+  renderTranscript();
+  feedbackPanel.style.display = 'none';
+  resetScoreUI();
+});
+
 restartBtn.addEventListener('click', () => {
   speechSynthesis.cancel();
   resetSessionId();
   conversation = [];
   renderTranscript();
   feedbackPanel.style.display = 'none';
-  feedbackBox.textContent = '';
+  resetScoreUI();
 });
+
 
 // Hint / Answer-for-me buttons
 hintBtn.addEventListener('click', () => {
@@ -1383,10 +1327,11 @@ menuBtn.addEventListener('click', () => {
 });
 
 document.addEventListener('click', (e) => {
-  if (!menu.contains(e.target) && !menuBtn.contains(e.target)){
+  if (!menuPanel.contains(e.target) && !menuBtn.contains(e.target)){
     menuPanel.classList.remove('open');
   }
 });
+
 
 /* ========= INTRO ANIMATION ========= */
 window.addEventListener('load', () => {
