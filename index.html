@@ -1014,14 +1014,44 @@ function extractScoreData(raw) {
 
   if (!raw) return null;
 
-  // direct object (webhook already returns the JSON)
+  // ---- 1) n8n returns an array [ { reply: "```json {...} ```" } ] ----
+  if (Array.isArray(raw) && raw.length > 0) {
+    raw = raw[0];
+  }
+
+  // ---- 2) If it's already an object with scores or nested feedback ----
   if (typeof raw === 'object') {
-    if (raw.overall_score !== undefined || raw.rating || raw.dimensions || raw.wins || raw.next_steps) {
+    // direct object with scoring fields
+    if (
+      raw.overall_score !== undefined ||
+      raw.rating !== undefined ||
+      raw.dimensions ||
+      raw.wins ||
+      raw.next_steps
+    ) {
       return raw;
     }
+
+    // nested { feedback: { ... } }
     if (raw.feedback && typeof raw.feedback === 'object') {
       return raw.feedback;
     }
+
+    // our case: { reply: "```json {...} ```" }
+    if (typeof raw.reply === 'string') {
+      let s = raw.reply.trim();
+      if (s.startsWith('```')) {
+        s = s.replace(/^```[a-zA-Z]*\s*/i, '').replace(/```$/, '');
+      }
+      try {
+        return JSON.parse(s);
+      } catch (e) {
+        console.error('Could not parse score JSON from reply:', e, s);
+        return null;
+      }
+    }
+
+    // fallback: sometimes people use "output"
     if (typeof raw.output === 'string') {
       let s = raw.output.trim();
       if (s.startsWith('```')) {
@@ -1036,6 +1066,7 @@ function extractScoreData(raw) {
     }
   }
 
+  // ---- 3) Raw string with JSON in it ----
   if (typeof raw === 'string') {
     let s = raw.trim();
     if (s.startsWith('```')) {
