@@ -392,11 +392,11 @@
   }
 
   .score-main{
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    margin-bottom:4px;
-  }
+  display:flex;
+  align-items:center;
+  gap:18px;
+  margin-bottom:8px;
+}
 
   .score-ring{
     position:relative;
@@ -418,12 +418,13 @@
     color:var(--accent);
   }
 
-  .score-summary{
-    margin:0 0 4px 0;
-    font-size:11px;
-    color:var(--text-soft);
-    text-align:center;
-  }
+ .score-summary{
+  margin:0;
+  font-size:12px;
+  color:var(--text-soft);
+  text-align:left;
+  max-width:260px;
+}
 
   .score-details{
     display:flex;
@@ -700,43 +701,59 @@
       </div>
     </div>
 
-    <div id="feedbackPanel" class="panel" style="margin-top:12px; display:none;">
-      <h3>Session feedback</h3>
-      <p class="panel-subtitle">Automated coaching summary from the scoring agent.</p>
+   <div id="feedbackPanel" class="panel" style="margin-top:12px; display:none;">
+  <h3>Session feedback</h3>
+  <p class="panel-subtitle">Automated coaching summary from the scoring agent.</p>
 
-      <div class="score-layout" style="margin-top:12px;">
+  <div class="score-layout" style="margin-top:12px;">
 
-        <!-- MAIN SCORE -->
-        <div class="score-main" style="text-align:center;margin-bottom:18px;">
-          <div id="scoreRing" class="score-ring">
-            <div>
-              <div id="scoreRingValue" class="score-ring-value">--</div>
-              <div id="scoreRingLabel" class="score-ring-label">Awaiting score…</div>
-            </div>
-          </div>
-          <p id="scoreSummary" class="score-summary" style="margin-top:10px;font-size:12px;opacity:.9;">
-            Click "Give me feedback" after a call to generate analysis.
-          </p>
-        </div>
+    <!-- MAIN RING + SUMMARY -->
+    <div class="score-main">
+      <div id="scoreRing" class="score-ring">
+        <svg viewBox="0 0 100 100">
+          <defs>
+            <linearGradient id="scoreGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#7cd3ff"/>
+              <stop offset="100%" stop-color="#a88cff"/>
+            </linearGradient>
+          </defs>
+          <circle class="score-ring-bg" cx="50" cy="50" r="46" />
+          <circle id="scoreRingFg" class="score-ring-fg" cx="50" cy="50" r="46" />
+        </svg>
 
-        <!-- SUB SCORES -->
-        <div id="scoresBreakdown" class="scores-breakdown" style="margin-top:14px;margin-bottom:16px;">
-          <!-- JS injects rows -->
-        </div>
-
-        <!-- WINS + NEXT STEPS -->
-        <div class="score-feedback-columns" style="gap:18px;margin-top:10px;flex-wrap:wrap;">
-          <div class="score-column" style="flex:1;min-width:150px;">
-            <h4 style="margin:0 0 6px 0;font-size:13px;color:#8ecfff;">What you did well</h4>
-            <ul id="winsList" style="margin:0;padding-left:16px;font-size:12px;line-height:1.3;"></ul>
-          </div>
-          <div class="score-column" style="flex:1;min-width:150px;">
-            <h4 style="margin:0 0 6px 0;font-size:13px;color:#ffb4f8;">What to improve next</h4>
-            <ul id="nextStepsList" style="margin:0;padding-left:16px;font-size:12px;line-height:1.3;"></ul>
-          </div>
+        <div class="score-number">
+          <span id="scoreRingValue">--</span>
+          <span class="score-max">/100</span>
+          <div class="score-label" id="scoreRingLabel">Awaiting score…</div>
         </div>
       </div>
+
+      <p id="scoreSummary" class="score-summary">
+        Click "Give me feedback" after a call to generate analysis.
+      </p>
     </div>
+
+    <!-- 5 SCORE BARS -->
+    <div id="scoresBreakdown" class="scores-breakdown" style="margin-top:14px;margin-bottom:16px;">
+      <!-- JS will inject rows here dynamically -->
+    </div>
+
+    <!-- WINS + NEXT STEPS SIDE-BY-SIDE -->
+    <div class="score-feedback-columns" style="display:flex;gap:18px;margin-top:10px;flex-wrap:wrap;">
+
+      <div class="score-column" style="flex:1;min-width:150px;">
+        <h4 style="margin:0 0 6px 0;font-size:13px;color:#8ecfff;">What you did well</h4>
+        <ul id="winsList" style="margin:0;padding-left:16px;font-size:12px;line-height:1.3;"></ul>
+      </div>
+
+      <div class="score-column" style="flex:1;min-width:150px;">
+        <h4 style="margin:0 0 6px 0;font-size:13px;color:#ffb4f8;">What to improve next</h4>
+        <ul id="nextStepsList" style="margin:0;padding-left:16px;font-size:12px;line-height:1.3;"></ul>
+      </div>
+    </div>
+  </div>
+</div>
+
 
   </div>
 </div>
@@ -1113,50 +1130,65 @@ async function requestFeedback(){
 }
 
 function updateScoreUI(scoreData){
-  console.log('updateScoreUI with:', scoreData);
+  // 1) Overall score
+  const overall   = Number(scoreData.overall_score ?? 0);
+  const clamped   = Math.max(0, Math.min(100, overall));
 
-  const overall  = Number(scoreData.overall_score ?? 0);
-  const clamped  = Math.max(0, Math.min(100, overall));
-  const rating   = scoreData.rating || '';
-  const summary  = scoreData.summary || '';
-  const dims     = Array.isArray(scoreData.dimensions) ? scoreData.dimensions : [];
-  const wins     = Array.isArray(scoreData.wins) ? scoreData.wins : [];
-  const next     = Array.isArray(scoreData.next_steps) ? scoreData.next_steps : [];
+  const ring       = document.getElementById('scoreRing');
+  const circle     = document.getElementById('scoreRingFg');
+  const ringNumber = document.getElementById('scoreRingValue');
+  const ringLabel  = document.getElementById('scoreRingLabel');
+  const summaryEl  = document.getElementById('scoreSummary');
 
-  const ringValue = document.getElementById('scoreRingValue');
-  const ringLabel = document.getElementById('scoreRingLabel');
-  const summaryEl = document.getElementById('scoreSummary');
+  // number + label + summary text
+  if (ringNumber) ringNumber.textContent = clamped.toString();
+  if (ringLabel)  ringLabel.textContent  = scoreData.rating || '';
+  if (summaryEl)  summaryEl.textContent  = scoreData.summary || '';
 
-  if (ringValue) ringValue.textContent = clamped.toString();
-  if (ringLabel) ringLabel.textContent = rating;
-  if (summaryEl) summaryEl.textContent = summary || 'Session scored.';
+  // animated ring fill
+  if (circle) {
+    const R = 46; // must match r="46" in SVG
+    const circumference = 2 * Math.PI * R;
 
+    circle.style.strokeDasharray  = circumference;
+    circle.style.transition       = 'stroke-dashoffset 1s ease';
+
+    const targetOffset = circumference * (1 - clamped / 100);
+    requestAnimationFrame(() => {
+      circle.style.strokeDashoffset = targetOffset;
+    });
+  }
+
+  // 2) Sub-scores
   const breakdown = document.getElementById('scoresBreakdown');
-  if (breakdown) {
+  if (breakdown && Array.isArray(scoreData.dimensions)) {
     breakdown.innerHTML = '';
-    dims.forEach((dim) => {
+
+    scoreData.dimensions.forEach((dim, idx) => {
       const percent = dim.max_score ? Math.round((dim.score / dim.max_score) * 100) : 0;
+
       const row = document.createElement('div');
       row.className = 'score-row';
       row.innerHTML = `
         <div class="score-row-label">${dim.name}</div>
         <div class="score-bar">
           <div class="score-bar-track">
-            <div class="score-bar-fill" style="width:${percent}%"></div>
+            <div class="score-bar-fill score-bar-fill-${idx+1}" style="width:${percent}%"></div>
           </div>
-          <div class="score-row-value">${dim.score} / ${dim.max_score}</div>
         </div>
+        <div class="score-row-value">${dim.score} / ${dim.max_score}</div>
       `;
       breakdown.appendChild(row);
     });
   }
 
+  // 3) Wins & next steps
   const winsList = document.getElementById('winsList');
   const nextList = document.getElementById('nextStepsList');
 
   if (winsList) {
     winsList.innerHTML = '';
-    wins.forEach(w => {
+    (scoreData.wins || []).forEach(w => {
       const li = document.createElement('li');
       li.textContent = w;
       winsList.appendChild(li);
@@ -1165,13 +1197,14 @@ function updateScoreUI(scoreData){
 
   if (nextList) {
     nextList.innerHTML = '';
-    next.forEach(n => {
+    (scoreData.next_steps || []).forEach(n => {
       const li = document.createElement('li');
       li.textContent = n;
       nextList.appendChild(li);
     });
   }
 }
+
 
 function resetScoreUI() {
   const ringValue   = document.getElementById('scoreRingValue');
